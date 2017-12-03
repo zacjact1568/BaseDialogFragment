@@ -1,60 +1,137 @@
-package me.imzack.app.end.view.dialog
+package me.imzack.lib.basedialogfragment
 
+import android.content.Context
+import android.graphics.Point
 import android.os.Bundle
-import android.support.annotation.StringRes
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.ButterKnife
-import butterknife.OnClick
+import android.view.WindowManager
 import kotlinx.android.synthetic.main.dialog_fragment_base.*
-import me.imzack.app.end.R
-import me.imzack.app.end.util.ResourceUtil
-import me.imzack.app.end.util.SystemUtil
 import java.io.Serializable
 
 abstract class BaseDialogFragment : DialogFragment() {
 
     companion object {
 
-        val ARG_TITLE_STR = "0"
-        val ARG_NEU_BTN_STR = "1"
-        val ARG_NEU_BTN_CLK_LSNR = "2"
-        val ARG_NEG_BTN_STR = "3"
-        val ARG_NEG_BTN_CLK_LSNR = "4"
-        val ARG_POS_BTN_STR = "5"
-        val ARG_POS_BTN_CLK_LSNR = "6"
+        private val ARG_TITLE = "title"
+        private val ARG_NEU_BTN_TEXT = "neu_btn_text"
+        private val ARG_NEU_BTN_CLICK_LISTENER = "neu_btn_click_listener"
+        private val ARG_NEG_BTN_TEXT = "neg_btn_text"
+        private val ARG_NEG_BTN_CLICK_LISTENER = "neg_btn_click_listener"
+        private val ARG_POS_BTN_TEXT = "pos_btn_text"
+        private val ARG_POS_BTN_CLICK_LISTENER = "pos_btn_click_listener"
+
+        // 当前不支持静态protected方法在子类中调用
+        fun putBaseArguments(
+                arguments: Bundle,
+                titleText: CharSequence? = null,
+                neutralButtonText: CharSequence? = null,
+                neutralButtonClickListener: OnButtonClickListener? = null,
+                negativeButtonText: CharSequence? = null,
+                negativeButtonClickListener: OnButtonClickListener? = null,
+                positiveButtonText: CharSequence? = null,
+                positiveButtonClickListener: OnButtonClickListener? = null
+        ) {
+            arguments.putCharSequence(ARG_TITLE, titleText)
+            arguments.putCharSequence(ARG_NEU_BTN_TEXT, neutralButtonText)
+            arguments.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, neutralButtonClickListener)
+            arguments.putCharSequence(ARG_NEG_BTN_TEXT, negativeButtonText)
+            arguments.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, negativeButtonClickListener)
+            arguments.putCharSequence(ARG_POS_BTN_TEXT, positiveButtonText)
+            arguments.putSerializable(ARG_POS_BTN_CLICK_LISTENER, positiveButtonClickListener)
+        }
     }
 
-    // 传入null表示不显示标题，下同
-    //TODO 这里应该将传入的字段放进Arguments，fragment重建后才能恢复新的？
-    var mTitleString: String? = null
-    var mNeutralButtonString: String? = null
-    var mNegativeButtonString: String? = null
-    var mPositiveButtonString: String? = null
-    var mNeutralButtonClickListener: OnButtonClickListener? = null
-    var mNegativeButtonClickListener: OnButtonClickListener? = null
-    var mPositiveButtonClickListener: OnButtonClickListener? = null
+    private var viewPropertiesInitialized = false
+    private var viewsInitialized = false
+
+    var titleText: CharSequence? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewsInitialized) {
+                updateTitle()
+            }
+            if (viewPropertiesInitialized) {
+                arguments.putCharSequence(ARG_TITLE, value)
+            }
+        }
+    var neutralButtonText: CharSequence? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewsInitialized) {
+                updateNeutralButtonText()
+            }
+            if (viewPropertiesInitialized) {
+                arguments.putCharSequence(ARG_NEU_BTN_TEXT, value)
+            }
+        }
+    var neutralButtonClickListener: OnButtonClickListener? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewPropertiesInitialized) {
+                arguments.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, value)
+            }
+        }
+    var negativeButtonText: CharSequence? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewsInitialized) {
+                updateNegativeButtonText()
+            }
+            if (viewPropertiesInitialized) {
+                arguments.putCharSequence(ARG_NEG_BTN_TEXT, value)
+            }
+        }
+    var negativeButtonClickListener: OnButtonClickListener? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewPropertiesInitialized) {
+                arguments.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, value)
+            }
+        }
+    var positiveButtonText: CharSequence? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewsInitialized) {
+                updatePositiveButtonText()
+            }
+            if (viewPropertiesInitialized) {
+                arguments.putCharSequence(ARG_POS_BTN_TEXT, value)
+            }
+        }
+    var positiveButtonClickListener: OnButtonClickListener? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (viewPropertiesInitialized) {
+                arguments.putSerializable(ARG_POS_BTN_CLICK_LISTENER, value)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val args = arguments
-        if (args != null) {
-            mTitleString = args.getString(ARG_TITLE_STR)
-            mNeutralButtonString = args.getString(ARG_NEU_BTN_STR)
-            // OnButtonClickListener不能为非空类型，因为可空类型不能转换成非空类型
-            mNeutralButtonClickListener = args.getSerializable(ARG_NEU_BTN_CLK_LSNR) as OnButtonClickListener?
-            mNegativeButtonString = args.getString(ARG_NEG_BTN_STR)
-            mNegativeButtonClickListener = args.getSerializable(ARG_NEG_BTN_CLK_LSNR) as OnButtonClickListener?
-            mPositiveButtonString = args.getString(ARG_POS_BTN_STR)
-            mPositiveButtonClickListener = args.getSerializable(ARG_POS_BTN_CLK_LSNR) as OnButtonClickListener?
-        }
+        titleText = arguments?.getCharSequence(ARG_TITLE)
+        neutralButtonText = arguments?.getCharSequence(ARG_NEU_BTN_TEXT)
+        neutralButtonClickListener = arguments?.getSerializable(ARG_NEU_BTN_CLICK_LISTENER) as OnButtonClickListener?
+        negativeButtonText = arguments?.getCharSequence(ARG_NEG_BTN_TEXT)
+        negativeButtonClickListener = arguments?.getSerializable(ARG_NEG_BTN_CLICK_LISTENER) as OnButtonClickListener?
+        positiveButtonText = arguments?.getCharSequence(ARG_POS_BTN_TEXT)
+        positiveButtonClickListener = arguments?.getSerializable(ARG_POS_BTN_CLICK_LISTENER) as OnButtonClickListener?
+
+        viewPropertiesInitialized = true
     }
 
-    /** 重写这个方法提供内容区域的view  */
+    /** 重写这个方法提供内容区域的view */
     abstract fun onCreateContentView(inflater: LayoutInflater, root: ViewGroup): View
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -65,131 +142,83 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ButterKnife.bind(this, view)
 
         //通过动态设置内容区域的view宽度来设置dialog宽度（不能直接设置根view的宽度，因为它的LayoutParams为null）
-        (view as ViewGroup).getChildAt(1).layoutParams.width = (SystemUtil.displayWidth * 0.8f).toInt()
+        val point = Point()
+        (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(point)
+        (view as ViewGroup).getChildAt(1).layoutParams.width = (point.x * 0.8f).toInt()
+
+        viewsInitialized = true
 
         updateTitle()
-        updateNeutralButtonString()
-        updateNegativeButtonString()
-        updatePositiveButtonString()
+        updateNeutralButtonText()
+        updateNegativeButtonText()
+        updatePositiveButtonText()
+
+        // 按键事件不需要更新，只要相应的listener属性更新就行了
+        vNeutralButton.setOnClickListener {
+            if (neutralButtonClickListener?.onClick() != false) {
+                dismiss()
+            }
+        }
+        vNegativeButton.setOnClickListener {
+            if (negativeButtonClickListener?.onClick() != false) {
+                dismiss()
+            }
+        }
+        vPositiveButton.setOnClickListener {
+            if (positiveButtonClickListener?.onClick() != false) {
+                dismiss()
+            }
+        }
     }
 
     override fun onDetach() {
         super.onDetach()
-        mNeutralButtonClickListener = null
-        mNegativeButtonClickListener = null
-        mPositiveButtonClickListener = null
+        neutralButtonClickListener = null
+        negativeButtonClickListener = null
+        positiveButtonClickListener = null
     }
 
-    @OnClick(R.id.btn_neutral, R.id.btn_negative, R.id.btn_positive)
-    fun onClickBase(view: View) {
-        if (when (view.id) {
-            R.id.btn_neutral -> mNeutralButtonClickListener?.onClick() != false
-            R.id.btn_negative -> mNegativeButtonClickListener?.onClick() != false
-            R.id.btn_positive -> mPositiveButtonClickListener?.onClick() != false
-            else -> true
-        }) {
-            dialog.dismiss()
+    private fun updateTitle() {
+        if (titleText == null) {
+            vTitleText.visibility = View.GONE
+        } else {
+            vTitleText.text = titleText
         }
     }
 
-    fun updateTitle() {
-        text_title.visibility = if (mTitleString == null) View.GONE else View.VISIBLE
-        text_title.text = mTitleString
+    private fun updateNeutralButtonText() {
+        if (neutralButtonText == null) {
+            vNeutralButton.visibility = View.GONE
+        } else {
+            vNeutralButton.text = neutralButtonText
+        }
     }
 
-    fun updateNeutralButtonString() {
-        btn_neutral.visibility = if (mNeutralButtonString == null) View.GONE else View.VISIBLE
-        btn_neutral.text = mNeutralButtonString
+    private fun updateNegativeButtonText() {
+        if (negativeButtonText == null) {
+            vNegativeButton.visibility = View.GONE
+        } else {
+            vNegativeButton.text = negativeButtonText
+        }
     }
 
-    fun updateNegativeButtonString() {
-        btn_negative.visibility = if (mNegativeButtonString == null) View.GONE else View.VISIBLE
-        btn_negative.text = mNegativeButtonString
-    }
-
-    fun updatePositiveButtonString() {
-        btn_positive.visibility = if (mPositiveButtonString == null) View.GONE else View.VISIBLE
-        btn_positive.text = mPositiveButtonString
+    private fun updatePositiveButtonText() {
+        if (positiveButtonText == null) {
+            vPositiveButton.visibility = View.GONE
+        } else {
+            vPositiveButton.text = positiveButtonText
+        }
     }
 
     fun show(manager: FragmentManager) {
         super.show(manager, null)
     }
 
-    abstract class Builder<out DF : BaseDialogFragment> {
-
-        private var mTitleStr: String? = null
-        private var mNeuBtnStr: String? = null
-        private var mNegBtnStr: String? = null
-        private var mPosBtnStr: String? = null
-        private var mNeuBtnClkLsnr: OnButtonClickListener? = null
-        private var mNegBtnClkLsnr: OnButtonClickListener? = null
-        private var mPosBtnClkLsnr: OnButtonClickListener? = null
-
-        fun setTitle(title: String): Builder<*> {
-            mTitleStr = title
-            return this
-        }
-
-        fun setTitle(@StringRes resId: Int) = setTitle(ResourceUtil.getString(resId))
-
-        // 若listener为null，点击此按钮直接关闭dialog
-        fun setNeutralButton(text: String, listener: OnButtonClickListener?): Builder<*> {
-            mNeuBtnStr = text
-            mNeuBtnClkLsnr = listener
-            return this
-        }
-
-        fun setNeutralButton(@StringRes resId: Int, listener: OnButtonClickListener?) =
-                setNeutralButton(ResourceUtil.getString(resId), listener)
-
-        fun setNegativeButton(text: String, listener: OnButtonClickListener?): Builder<*> {
-            mNegBtnStr = text
-            mNegBtnClkLsnr = listener
-            return this
-        }
-
-        fun setNegativeButton(@StringRes resId: Int, listener: OnButtonClickListener?) =
-                setNegativeButton(ResourceUtil.getString(resId), listener)
-
-        fun setPositiveButton(text: String, listener: OnButtonClickListener?): Builder<*> {
-            mPosBtnStr = text
-            mPosBtnClkLsnr = listener
-            return this
-        }
-
-        fun setPositiveButton(@StringRes resId: Int, listener: OnButtonClickListener?) =
-                setPositiveButton(ResourceUtil.getString(resId), listener)
-
-        /** 重写此方法提供子类DialogFragment  */
-        protected abstract fun onBuildContent(): DF
-
-        /** 仅创建DialogFragment，不附到activity上  */
-        fun build(): DF {
-            val dialogFragment = onBuildContent()
-            val args = dialogFragment.arguments
-            args.putString(ARG_TITLE_STR, mTitleStr)
-            args.putString(ARG_NEU_BTN_STR, mNeuBtnStr)
-            args.putSerializable(ARG_NEU_BTN_CLK_LSNR, mNeuBtnClkLsnr)
-            args.putString(ARG_NEG_BTN_STR, mNegBtnStr)
-            args.putSerializable(ARG_NEG_BTN_CLK_LSNR, mNegBtnClkLsnr)
-            args.putString(ARG_POS_BTN_STR, mPosBtnStr)
-            args.putSerializable(ARG_POS_BTN_CLK_LSNR, mPosBtnClkLsnr)
-            return dialogFragment
-        }
-
-        /** 创建DialogFragment并将其附到activity上  */
-        fun show(manager: FragmentManager) {
-            build().show(manager)
-        }
-    }
-
     // 继承了Serializable，没法写成函数类型
     interface OnButtonClickListener : Serializable {
-        /** 按钮按下时调用，返回值表示是否关闭dialog  */
+        /** 按钮按下时调用，返回值表示是否关闭dialog */
         fun onClick(): Boolean
     }
 }
