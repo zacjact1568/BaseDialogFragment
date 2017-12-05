@@ -11,12 +11,12 @@ class SimpleDialogFragment : BaseDialogFragment() {
 
     companion object {
 
-        private val ARG_MESSAGE = "message"
+        private val ARG_CONTENT = "content"
 
         fun newInstance(
                 context: Context,
                 titleText: CharSequence? = null,
-                messageText: CharSequence,
+                contentText: CharSequence,
                 okButtonClickListener: (() -> Unit)? = null
         ): SimpleDialogFragment {
             val fragment = SimpleDialogFragment()
@@ -40,7 +40,7 @@ class SimpleDialogFragment : BaseDialogFragment() {
                         }
                     }
             )
-            arguments.putCharSequence(ARG_MESSAGE, messageText)
+            arguments.putCharSequence(ARG_CONTENT, contentText)
             fragment.arguments = arguments
             return fragment
         }
@@ -51,6 +51,6 @@ class SimpleDialogFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        vMessageText.text = arguments?.getCharSequence(ARG_MESSAGE)
+        vContentText.text = arguments?.getCharSequence(ARG_CONTENT)
     }
 }
