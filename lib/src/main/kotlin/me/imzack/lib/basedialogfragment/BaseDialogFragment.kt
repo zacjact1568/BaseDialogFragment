@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.dialog_fragment_base.*
 import java.io.Serializable
 
@@ -136,14 +137,23 @@ abstract class BaseDialogFragment : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.dialog_fragment_base, container, false) as ViewGroup
-        root.addView(onCreateContentView(inflater, root), 1)
+        val content = onCreateContentView(inflater, root)
+        // 使用title的marginStart来作为content的水平margin
+        val horizontalMargin = (root.getChildAt(0).layoutParams as LinearLayout.LayoutParams).marginStart
+        val contentLayoutParams = (content.layoutParams as LinearLayout.LayoutParams)
+        contentLayoutParams.marginStart = horizontalMargin
+        contentLayoutParams.marginEnd = horizontalMargin
+        // 使按钮区域不会被内容区域挤出去
+        contentLayoutParams.height = 0
+        contentLayoutParams.weight = 1f
+        root.addView(content, 1)
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //通过动态设置内容区域的view宽度来设置dialog宽度（不能直接设置根view的宽度，因为它的LayoutParams为null）
+        // 通过动态设置内容区域的view宽度来设置dialog宽度（不能直接设置根view的宽度，因为它的LayoutParams为null）
         val point = Point()
         (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(point)
         (view as ViewGroup).getChildAt(1).layoutParams.width = (point.x * 0.8f).toInt()
