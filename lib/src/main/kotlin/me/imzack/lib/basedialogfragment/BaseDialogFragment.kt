@@ -57,7 +57,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                 updateTitle()
             }
             if (viewPropertiesInitialized) {
-                arguments.putCharSequence(ARG_TITLE, value)
+                arguments?.putCharSequence(ARG_TITLE, value)
             }
         }
     var neutralButtonText: CharSequence? = null
@@ -68,7 +68,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                 updateNeutralButtonText()
             }
             if (viewPropertiesInitialized) {
-                arguments.putCharSequence(ARG_NEU_BTN_TEXT, value)
+                arguments?.putCharSequence(ARG_NEU_BTN_TEXT, value)
             }
         }
     var neutralButtonClickListener: OnButtonClickListener? = null
@@ -76,7 +76,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             if (field == value) return
             field = value
             if (viewPropertiesInitialized) {
-                arguments.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, value)
+                arguments?.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, value)
             }
         }
     var negativeButtonText: CharSequence? = null
@@ -87,7 +87,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                 updateNegativeButtonText()
             }
             if (viewPropertiesInitialized) {
-                arguments.putCharSequence(ARG_NEG_BTN_TEXT, value)
+                arguments?.putCharSequence(ARG_NEG_BTN_TEXT, value)
             }
         }
     var negativeButtonClickListener: OnButtonClickListener? = null
@@ -95,7 +95,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             if (field == value) return
             field = value
             if (viewPropertiesInitialized) {
-                arguments.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, value)
+                arguments?.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, value)
             }
         }
     var positiveButtonText: CharSequence? = null
@@ -106,7 +106,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                 updatePositiveButtonText()
             }
             if (viewPropertiesInitialized) {
-                arguments.putCharSequence(ARG_POS_BTN_TEXT, value)
+                arguments?.putCharSequence(ARG_POS_BTN_TEXT, value)
             }
         }
     var positiveButtonClickListener: OnButtonClickListener? = null
@@ -114,7 +114,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             if (field == value) return
             field = value
             if (viewPropertiesInitialized) {
-                arguments.putSerializable(ARG_POS_BTN_CLICK_LISTENER, value)
+                arguments?.putSerializable(ARG_POS_BTN_CLICK_LISTENER, value)
             }
         }
 
@@ -129,7 +129,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         positiveButtonText = arguments?.getCharSequence(ARG_POS_BTN_TEXT)
         positiveButtonClickListener = arguments?.getSerializable(ARG_POS_BTN_CLICK_LISTENER) as OnButtonClickListener?
 
-        viewPropertiesInitialized = true
+        viewPropertiesInitialized = arguments != null
     }
 
     /** 重写这个方法提供内容区域的view */
