@@ -46,91 +46,56 @@ abstract class BaseDialogFragment : DialogFragment() {
         }
     }
 
-    private var viewPropertiesInitialized = false
-    private var viewsInitialized = false
+    private var initialized = false
 
-    var titleText: CharSequence? = null
+    var titleText: CharSequence?
+        get() = arguments?.getCharSequence(ARG_TITLE)
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewsInitialized) {
+            arguments?.putCharSequence(ARG_TITLE, value)
+            if (initialized) {
                 updateTitle()
             }
-            if (viewPropertiesInitialized) {
-                arguments?.putCharSequence(ARG_TITLE, value)
-            }
         }
-    var neutralButtonText: CharSequence? = null
+    var neutralButtonText: CharSequence?
+        get() = arguments?.getCharSequence(ARG_NEU_BTN_TEXT)
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewsInitialized) {
+            arguments?.putCharSequence(ARG_NEU_BTN_TEXT, value)
+            if (initialized) {
                 updateNeutralButtonText()
             }
-            if (viewPropertiesInitialized) {
-                arguments?.putCharSequence(ARG_NEU_BTN_TEXT, value)
-            }
         }
-    var neutralButtonClickListener: OnButtonClickListener? = null
+    var neutralButtonClickListener: OnButtonClickListener?
+        get() = arguments?.getSerializable(ARG_NEU_BTN_CLICK_LISTENER) as OnButtonClickListener?
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewPropertiesInitialized) {
-                arguments?.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, value)
-            }
+            // 不能简写成“=”
+            arguments?.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, value)
         }
-    var negativeButtonText: CharSequence? = null
+    var negativeButtonText: CharSequence?
+        get() = arguments?.getCharSequence(ARG_NEG_BTN_TEXT)
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewsInitialized) {
+            arguments?.putCharSequence(ARG_NEG_BTN_TEXT, value)
+            if (initialized) {
                 updateNegativeButtonText()
             }
-            if (viewPropertiesInitialized) {
-                arguments?.putCharSequence(ARG_NEG_BTN_TEXT, value)
-            }
         }
-    var negativeButtonClickListener: OnButtonClickListener? = null
+    var negativeButtonClickListener: OnButtonClickListener?
+        get() = arguments?.getSerializable(ARG_NEG_BTN_CLICK_LISTENER) as OnButtonClickListener?
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewPropertiesInitialized) {
-                arguments?.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, value)
-            }
+            arguments?.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, value)
         }
-    var positiveButtonText: CharSequence? = null
+    var positiveButtonText: CharSequence?
+        get() = arguments?.getCharSequence(ARG_POS_BTN_TEXT)
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewsInitialized) {
+            arguments?.putCharSequence(ARG_POS_BTN_TEXT, value)
+            if (initialized) {
                 updatePositiveButtonText()
             }
-            if (viewPropertiesInitialized) {
-                arguments?.putCharSequence(ARG_POS_BTN_TEXT, value)
-            }
         }
-    var positiveButtonClickListener: OnButtonClickListener? = null
+    var positiveButtonClickListener: OnButtonClickListener?
+        get() = arguments?.getSerializable(ARG_POS_BTN_CLICK_LISTENER) as OnButtonClickListener?
         set(value) {
-            if (field == value) return
-            field = value
-            if (viewPropertiesInitialized) {
-                arguments?.putSerializable(ARG_POS_BTN_CLICK_LISTENER, value)
-            }
+            arguments?.putSerializable(ARG_POS_BTN_CLICK_LISTENER, value)
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        titleText = arguments?.getCharSequence(ARG_TITLE)
-        neutralButtonText = arguments?.getCharSequence(ARG_NEU_BTN_TEXT)
-        neutralButtonClickListener = arguments?.getSerializable(ARG_NEU_BTN_CLICK_LISTENER) as OnButtonClickListener?
-        negativeButtonText = arguments?.getCharSequence(ARG_NEG_BTN_TEXT)
-        negativeButtonClickListener = arguments?.getSerializable(ARG_NEG_BTN_CLICK_LISTENER) as OnButtonClickListener?
-        positiveButtonText = arguments?.getCharSequence(ARG_POS_BTN_TEXT)
-        positiveButtonClickListener = arguments?.getSerializable(ARG_POS_BTN_CLICK_LISTENER) as OnButtonClickListener?
-
-        viewPropertiesInitialized = arguments != null
-    }
 
     /** 重写这个方法提供内容区域的view */
     abstract fun onCreateContentView(inflater: LayoutInflater, root: ViewGroup): View
@@ -158,7 +123,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(point)
         (view as ViewGroup).getChildAt(1).layoutParams.width = (point.x * 0.8f).toInt()
 
-        viewsInitialized = true
+        initialized = true
 
         updateTitle()
         updateNeutralButtonText()
@@ -181,13 +146,6 @@ abstract class BaseDialogFragment : DialogFragment() {
                 dismiss()
             }
         }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        neutralButtonClickListener = null
-        negativeButtonClickListener = null
-        positiveButtonClickListener = null
     }
 
     private fun updateTitle() {

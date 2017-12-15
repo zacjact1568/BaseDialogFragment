@@ -29,9 +29,7 @@ class SimpleDialogFragment : BaseDialogFragment() {
                     null,
                     context.getString(android.R.string.cancel),
                     object : OnButtonClickListener {
-                        override fun onClick(): Boolean {
-                            return true
-                        }
+                        override fun onClick() = true
                     },
                     context.getString(android.R.string.ok),
                     object : OnButtonClickListener {
