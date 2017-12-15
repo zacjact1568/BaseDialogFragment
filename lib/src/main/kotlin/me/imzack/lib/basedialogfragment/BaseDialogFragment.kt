@@ -46,7 +46,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         }
     }
 
-    private var initialized = false
+    protected var initialized = false
 
     var titleText: CharSequence?
         get() = arguments?.getCharSequence(ARG_TITLE)
