@@ -25,6 +25,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         private val ARG_NEG_BTN_CLICK_LISTENER = "neg_btn_click_listener"
         private val ARG_POS_BTN_TEXT = "pos_btn_text"
         private val ARG_POS_BTN_CLICK_LISTENER = "pos_btn_click_listener"
+        private val ARG_ADD_HORIZONTAL_MARGINS = "add_horizontal_margins"
 
         // 当前不支持静态protected方法在子类中调用
         fun putBaseArguments(
@@ -35,7 +36,8 @@ abstract class BaseDialogFragment : DialogFragment() {
                 negativeButtonText: CharSequence? = null,
                 negativeButtonClickListener: OnButtonClickListener? = null,
                 positiveButtonText: CharSequence? = null,
-                positiveButtonClickListener: OnButtonClickListener? = null
+                positiveButtonClickListener: OnButtonClickListener? = null,
+                addHorizontalMargins: Boolean = true
         ) {
             arguments.putCharSequence(ARG_TITLE, titleText)
             arguments.putCharSequence(ARG_NEU_BTN_TEXT, neutralButtonText)
@@ -44,6 +46,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             arguments.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, negativeButtonClickListener)
             arguments.putCharSequence(ARG_POS_BTN_TEXT, positiveButtonText)
             arguments.putSerializable(ARG_POS_BTN_CLICK_LISTENER, positiveButtonClickListener)
+            arguments.putBoolean(ARG_ADD_HORIZONTAL_MARGINS, addHorizontalMargins)
         }
     }
 
@@ -109,11 +112,13 @@ abstract class BaseDialogFragment : DialogFragment() {
     final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.dialog_fragment_base, container, false) as ViewGroup
         val content = onCreateContentView(inflater, root)
-        // 使用title的marginStart来作为content的水平margin
-        val horizontalMargin = (root.getChildAt(0).layoutParams as LinearLayout.LayoutParams).marginStart
         val contentLayoutParams = (content.layoutParams as LinearLayout.LayoutParams)
-        contentLayoutParams.marginStart = horizontalMargin
-        contentLayoutParams.marginEnd = horizontalMargin
+        // 使用 title 的 marginStart 来作为 content 的水平 margin
+        if (arguments.getBoolean(ARG_ADD_HORIZONTAL_MARGINS)) {
+            val horizontalMargin = (root.getChildAt(0).layoutParams as LinearLayout.LayoutParams).marginStart
+            contentLayoutParams.marginStart = horizontalMargin
+            contentLayoutParams.marginEnd = horizontalMargin
+        }
         // 使按钮区域不会被内容区域挤出去
         contentLayoutParams.height = 0
         contentLayoutParams.weight = 1f
