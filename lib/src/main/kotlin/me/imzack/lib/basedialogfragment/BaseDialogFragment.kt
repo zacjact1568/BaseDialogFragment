@@ -3,6 +3,7 @@ package me.imzack.lib.basedialogfragment
 import android.content.Context
 import android.graphics.Point
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
@@ -46,61 +47,66 @@ abstract class BaseDialogFragment : DialogFragment() {
         }
     }
 
+    /** 指示 view 是否已初始化 */
     protected var initialized = false
 
-    var titleText: CharSequence?
-        get() = arguments?.getCharSequence(ARG_TITLE)
+    // 类初始化的时候并不会调用 getter
+    // 运行时对属性的更新不会保持，若要保持，需要自行将值存储到 arguments 中
+    var titleText: CharSequence? = null
         set(value) {
-            arguments?.putCharSequence(ARG_TITLE, value)
+            // 更新幕后字段
+            if (value == field) return
+            field = value
+            // 若 view 已初始化，则刷新 view
             if (initialized) {
                 updateTitle()
             }
         }
-    var neutralButtonText: CharSequence?
-        get() = arguments?.getCharSequence(ARG_NEU_BTN_TEXT)
+    var neutralButtonText: CharSequence? = null
         set(value) {
-            arguments?.putCharSequence(ARG_NEU_BTN_TEXT, value)
+            if (value == field) return
+            field = value
             if (initialized) {
                 updateNeutralButtonText()
             }
         }
-    var neutralButtonClickListener: OnButtonClickListener?
-        get() = arguments?.getSerializable(ARG_NEU_BTN_CLICK_LISTENER) as OnButtonClickListener?
+    var neutralButtonClickListener: OnButtonClickListener? = null
+    var negativeButtonText: CharSequence? = null
         set(value) {
-            // 不能简写成“=”
-            arguments?.putSerializable(ARG_NEU_BTN_CLICK_LISTENER, value)
-        }
-    var negativeButtonText: CharSequence?
-        get() = arguments?.getCharSequence(ARG_NEG_BTN_TEXT)
-        set(value) {
-            arguments?.putCharSequence(ARG_NEG_BTN_TEXT, value)
+            if (value == field) return
+            field = value
             if (initialized) {
                 updateNegativeButtonText()
             }
         }
-    var negativeButtonClickListener: OnButtonClickListener?
-        get() = arguments?.getSerializable(ARG_NEG_BTN_CLICK_LISTENER) as OnButtonClickListener?
+    var negativeButtonClickListener: OnButtonClickListener? = null
+    var positiveButtonText: CharSequence? = null
         set(value) {
-            arguments?.putSerializable(ARG_NEG_BTN_CLICK_LISTENER, value)
-        }
-    var positiveButtonText: CharSequence?
-        get() = arguments?.getCharSequence(ARG_POS_BTN_TEXT)
-        set(value) {
-            arguments?.putCharSequence(ARG_POS_BTN_TEXT, value)
+            if (value == field) return
+            field = value
             if (initialized) {
                 updatePositiveButtonText()
             }
         }
-    var positiveButtonClickListener: OnButtonClickListener?
-        get() = arguments?.getSerializable(ARG_POS_BTN_CLICK_LISTENER) as OnButtonClickListener?
-        set(value) {
-            arguments?.putSerializable(ARG_POS_BTN_CLICK_LISTENER, value)
-        }
+    var positiveButtonClickListener: OnButtonClickListener? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // 在这里初始化所有 view 属性，因为可以保证 arguments 不为空
+        titleText = arguments.getCharSequence(ARG_TITLE)
+        negativeButtonText = arguments.getCharSequence(ARG_NEU_BTN_TEXT)
+        neutralButtonClickListener = arguments.getSerializable(ARG_NEU_BTN_CLICK_LISTENER) as OnButtonClickListener?
+        negativeButtonText = arguments.getCharSequence(ARG_NEG_BTN_TEXT)
+        negativeButtonClickListener = arguments.getSerializable(ARG_NEG_BTN_CLICK_LISTENER) as OnButtonClickListener?
+        positiveButtonText = arguments.getCharSequence(ARG_POS_BTN_TEXT)
+        positiveButtonClickListener = arguments.getSerializable(ARG_POS_BTN_CLICK_LISTENER) as OnButtonClickListener?
+    }
 
     /** 重写这个方法提供内容区域的view */
     abstract fun onCreateContentView(inflater: LayoutInflater, root: ViewGroup): View
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.dialog_fragment_base, container, false) as ViewGroup
         val content = onCreateContentView(inflater, root)
         // 使用title的marginStart来作为content的水平margin
@@ -115,6 +121,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         return root
     }
 
+    @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
