@@ -98,7 +98,7 @@ abstract class BaseDialogFragment : DialogFragment() {
 
         // 在这里初始化所有 view 属性，因为可以保证 arguments 不为空
         titleText = arguments.getCharSequence(ARG_TITLE)
-        negativeButtonText = arguments.getCharSequence(ARG_NEU_BTN_TEXT)
+        neutralButtonText = arguments.getCharSequence(ARG_NEU_BTN_TEXT)
         neutralButtonClickListener = arguments.getSerializable(ARG_NEU_BTN_CLICK_LISTENER) as OnButtonClickListener?
         negativeButtonText = arguments.getCharSequence(ARG_NEG_BTN_TEXT)
         negativeButtonClickListener = arguments.getSerializable(ARG_NEG_BTN_CLICK_LISTENER) as OnButtonClickListener?
