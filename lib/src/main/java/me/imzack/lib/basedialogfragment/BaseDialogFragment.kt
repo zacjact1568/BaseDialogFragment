@@ -22,24 +22,47 @@ abstract class BaseDialogFragment : DialogFragment() {
         private const val ARG_ADD_HORIZONTAL_MARGINS = "add_horizontal_margins"
 
         // 当前不支持静态 protected 方法在子类中调用
-        fun putTitle(args: Bundle, title: CharSequence) {
-            args.putCharSequence(ARG_TITLE, title)
+        fun putTitle(args: Bundle, title: CharSequence?) {
+            if (title != null) {
+                args.putCharSequence(ARG_TITLE, title)
+            } else {
+                // 不用判断 args 中是否有 ARG_TITLE 键，remove 会自动判断
+                args.remove(ARG_TITLE)
+            }
         }
 
-        fun putNeutralButtonText(args: Bundle, neutralButtonText: CharSequence) {
-            args.putCharSequence(ARG_NEUTRAL_BUTTON_TEXT, neutralButtonText)
+        fun putNeutralButtonText(args: Bundle, neutralButtonText: CharSequence?) {
+            if (neutralButtonText != null) {
+                args.putCharSequence(ARG_NEUTRAL_BUTTON_TEXT, neutralButtonText)
+            } else {
+                args.remove(ARG_NEUTRAL_BUTTON_TEXT)
+            }
         }
 
-        fun putNegativeButtonText(args: Bundle, negativeButtonText: CharSequence) {
-            args.putCharSequence(ARG_NEGATIVE_BUTTON_TEXT, negativeButtonText)
+        fun putNegativeButtonText(args: Bundle, negativeButtonText: CharSequence?) {
+            if (negativeButtonText != null) {
+                args.putCharSequence(ARG_NEGATIVE_BUTTON_TEXT, negativeButtonText)
+            } else {
+                args.remove(ARG_NEGATIVE_BUTTON_TEXT)
+            }
         }
 
-        fun putPositiveButtonText(args: Bundle, positiveButtonText: CharSequence) {
-            args.putCharSequence(ARG_POSITIVE_BUTTON_TEXT, positiveButtonText)
+        fun putPositiveButtonText(args: Bundle, positiveButtonText: CharSequence?) {
+            if (positiveButtonText != null) {
+                args.putCharSequence(ARG_POSITIVE_BUTTON_TEXT, positiveButtonText)
+            } else {
+                args.remove(ARG_POSITIVE_BUTTON_TEXT)
+            }
         }
 
         fun putAddHorizontalMargins(args: Bundle, addHorizontalMargins: Boolean) {
-            args.putBoolean(ARG_ADD_HORIZONTAL_MARGINS, addHorizontalMargins)
+            if (!addHorizontalMargins) {
+                // false 才放入 args
+                args.putBoolean(ARG_ADD_HORIZONTAL_MARGINS, addHorizontalMargins)
+            } else {
+                // true 不放入 args，稍后直接取默认值 true
+                args.remove(ARG_ADD_HORIZONTAL_MARGINS)
+            }
         }
     }
 
