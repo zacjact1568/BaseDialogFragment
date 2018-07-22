@@ -90,7 +90,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             }
         }
     var positiveButtonClickListener: (() -> Boolean)? = null
-    var dismissListener: (() -> Unit)? = null
+    var cancelListener: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -156,9 +156,9 @@ abstract class BaseDialogFragment : DialogFragment() {
         }
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        dismissListener?.invoke()
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        cancelListener?.invoke()
     }
 
     private fun updateTitle() {

@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
             // 在这里设置监听，才能在 Activity 重建时恢复
             fragment as ExampleDialogFragment
             fragment.okButtonClickListener = { Toast.makeText(this, "You touched the \"OK\" button!", Toast.LENGTH_SHORT).show() }
-            fragment.dismissListener = { Toast.makeText(this, "Dismissed!", Toast.LENGTH_SHORT).show() }
+            fragment.cancelListener = { Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show() }
         }
     }
 }
