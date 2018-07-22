@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.imzack.lib.basedialogfragmentexample">
+    package="net.zackzhang.lib.basedialogfragmentexample">
 
     <application
         android:allowBackup="true"
