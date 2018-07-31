@@ -23,7 +23,7 @@ class ExampleDialogFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        vContentText.text = arguments!!.getCharSequence(ARG_CONTENT)
+        vContentText.text = arguments?.getCharSequence(ARG_CONTENT)
 
         negativeButtonClickListener = { true }
         positiveButtonClickListener = {

@@ -5,11 +5,11 @@ import android.content.DialogInterface
 import android.graphics.Point
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v7.widget.LinearLayoutCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.dialog_fragment_base.*
 
 abstract class BaseDialogFragment : DialogFragment() {
@@ -57,7 +57,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             if (initialized) {
                 updateTitle()
                 // 为防止在 onCreate 中 get 后又 put
-                arguments!!.putCharSequence(ARG_TITLE, value)
+                arguments?.putCharSequence(ARG_TITLE, value)
             }
         }
     var neutralButtonText: CharSequence? = null
@@ -66,7 +66,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             field = value
             if (initialized) {
                 updateNeutralButtonText()
-                arguments!!.putCharSequence(ARG_NEUTRAL_BUTTON_TEXT, value)
+                arguments?.putCharSequence(ARG_NEUTRAL_BUTTON_TEXT, value)
             }
         }
     var neutralButtonClickListener: (() -> Boolean)? = null
@@ -76,7 +76,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             field = value
             if (initialized) {
                 updateNegativeButtonText()
-                arguments!!.putCharSequence(ARG_NEGATIVE_BUTTON_TEXT, value)
+                arguments?.putCharSequence(ARG_NEGATIVE_BUTTON_TEXT, value)
             }
         }
     var negativeButtonClickListener: (() -> Boolean)? = null
@@ -86,7 +86,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             field = value
             if (initialized) {
                 updatePositiveButtonText()
-                arguments!!.putCharSequence(ARG_POSITIVE_BUTTON_TEXT, value)
+                arguments?.putCharSequence(ARG_POSITIVE_BUTTON_TEXT, value)
             }
         }
     var positiveButtonClickListener: (() -> Boolean)? = null
@@ -95,26 +95,26 @@ abstract class BaseDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 在这里初始化所有 view 属性，因为可以保证 arguments 不为空
-        titleText = arguments!!.getCharSequence(ARG_TITLE)
-        neutralButtonText = arguments!!.getCharSequence(ARG_NEUTRAL_BUTTON_TEXT)
-        negativeButtonText = arguments!!.getCharSequence(ARG_NEGATIVE_BUTTON_TEXT)
-        positiveButtonText = arguments!!.getCharSequence(ARG_POSITIVE_BUTTON_TEXT)
+        // 初始化所有 view 属性
+        titleText = arguments?.getCharSequence(ARG_TITLE)
+        neutralButtonText = arguments?.getCharSequence(ARG_NEUTRAL_BUTTON_TEXT)
+        negativeButtonText = arguments?.getCharSequence(ARG_NEGATIVE_BUTTON_TEXT)
+        positiveButtonText = arguments?.getCharSequence(ARG_POSITIVE_BUTTON_TEXT)
 
         // view 属性已初始化
         initialized = true
     }
 
-    /** 重写这个方法提供内容区域的view */
+    /** 重写这个方法提供内容区域的 view */
     abstract fun onCreateContentView(inflater: LayoutInflater, root: ViewGroup): View
 
     final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.dialog_fragment_base, container, false) as ViewGroup
         val content = onCreateContentView(inflater, root)
-        val contentLayoutParams = (content.layoutParams as LinearLayout.LayoutParams)
+        val contentLayoutParams = (content.layoutParams as LinearLayoutCompat.LayoutParams)
         // 使用 title 的 marginStart 来作为 content 的水平 margin
-        if (arguments!!.getBoolean(ARG_ADD_HORIZONTAL_MARGINS, true)) {
-            val horizontalMargin = (root.getChildAt(0).layoutParams as LinearLayout.LayoutParams).marginStart
+        if (arguments?.getBoolean(ARG_ADD_HORIZONTAL_MARGINS, true) != false) {
+            val horizontalMargin = (root.getChildAt(0).layoutParams as LinearLayoutCompat.LayoutParams).marginStart
             contentLayoutParams.marginStart = horizontalMargin
             contentLayoutParams.marginEnd = horizontalMargin
         }
@@ -128,7 +128,7 @@ abstract class BaseDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 通过动态设置内容区域的view宽度来设置dialog宽度（不能直接设置根view的宽度，因为它的LayoutParams为null）
+        // 通过动态设置内容区域的 view 宽度来设置 dialog 宽度（不能直接设置根 view 的宽度，因为它的 LayoutParams 为 null）
         val point = Point()
         (context!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(point)
         (view as ViewGroup).getChildAt(1).layoutParams.width = (point.x * 0.8f).toInt()
@@ -138,7 +138,7 @@ abstract class BaseDialogFragment : DialogFragment() {
         updateNegativeButtonText()
         updatePositiveButtonText()
 
-        // 按键事件不需要更新，只要相应的listener属性更新就行了
+        // 按键事件不需要更新，只要相应的 listener 属性更新就行了
         vNeutralButton.setOnClickListener {
             if (neutralButtonClickListener?.invoke() != false) {
                 dismiss()
